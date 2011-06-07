@@ -16,6 +16,7 @@ public class Gong extends Activity implements OnClickListener {
 	
 	private MediaPlayer mediaPlayer = null;
 	private Timer lightningTimer = null;
+	private GongTimerTask gongTimerTask = null;
 
     /** Called when the activity is first created. */
     @Override
@@ -43,10 +44,13 @@ public class Gong extends Activity implements OnClickListener {
 	}
     
 	private void start() {
+		if (lightningTimer != null) {
+			stop();
+		}
 		lightningTimer = new Timer(true);
-		final GongTimerTask gtt = new GongTimerTask();
-		final long gongIntervalMtime = 5*1000;
-		lightningTimer.schedule(gtt, 0, gongIntervalMtime);
+		gongTimerTask = new GongTimerTask();
+		final long gongIntervalMtime = 10*1000;
+		lightningTimer.schedule(gongTimerTask, 0, gongIntervalMtime);
 	}
 
 	private void stop() {
@@ -54,9 +58,6 @@ public class Gong extends Activity implements OnClickListener {
 	}
 	
 	private void gong() {
-		if (mediaPlayer != null) {
-			mediaPlayer.release();
-		}
 		mediaPlayer = MediaPlayer.create(this, R.raw.dora);
 		mediaPlayer.start();
 	}
