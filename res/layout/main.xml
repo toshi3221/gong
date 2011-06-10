@@ -16,8 +16,8 @@
     android:layout_height="wrap_content" 
     android:text="@string/main_title"
     android:layout_gravity="center"
-    android:layout_marginBottom="25dip"
-    android:textSize="24.5sp"
+    android:layout_marginBottom="35dip"
+    android:textSize="35sp"
     />
 <Button  
     android:id="@+id/start_button"
@@ -31,6 +31,21 @@
 	android:id="@+id/stop_button"
 	android:text="@string/stop"
 	android:layout_width="match_parent"
+	android:layout_marginBottom="25dip"
 	/>
+<Button
+	android:layout_height="wrap_content"
+	android:id="@+id/reset_button"
+	android:text="@string/reset"
+	android:layout_width="match_parent"
+	android:layout_marginBottom="25dip"
+	/>
+<TextView
+	android:layout_height="wrap_content"
+	android:text="00:00.0"
+	android:layout_width="wrap_content"
+	android:textSize="75sp"
+	android:id="@+id/time"
+	android:layout_gravity="center"/>
 </LinearLayout>
 </LinearLayout>

@@ -4,4 +4,5 @@
     <string name="app_name">Lightning Gong</string>
     <string name="start">Start</string>
     <string name="stop">Stop</string>
+    <string name="reset">Reset</string>
 </resources>
