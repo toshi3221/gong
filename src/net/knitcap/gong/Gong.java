@@ -6,11 +6,15 @@ import java.util.TimerTask;
 import net.knitcap.gong.R;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.AsyncTask.Status;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.TextView;
@@ -22,15 +26,14 @@ public class Gong extends Activity implements OnClickListener {
 	private AsyncTask<String, Object, String> gongTimeSetTextAsyncTask = null;
 	private GongTimerTask gongTimerTask = null;
 	final private long gongTimerTaskIntervalMtime = 100;
-	final private long gongIntervalMtime = 10*1000;
+	private long gongIntervalMtime = 300*1000;
 	private long currentMtime = 0;
 
-    /** Called when the activity is first created. */
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        
+   
         final View startButton = findViewById(R.id.start_button);
         startButton.setOnClickListener(this);
         final View stopButton = findViewById(R.id.stop_button);
@@ -41,7 +44,25 @@ public class Gong extends Activity implements OnClickListener {
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
     }
 
-	public void onClick(View v) {
+    @Override
+    public boolean onCreateOptionsMenu(final Menu menu) {
+    	super.onCreateOptionsMenu(menu);
+        final MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(final MenuItem item) {
+    	switch (item.getItemId()) {
+    	case R.id.settings:
+    		startActivity(new Intent(this, Prefs.class));
+    		return true;
+    	}
+    	return false;
+    }
+
+	public void onClick(final View v) {
 		switch (v.getId()) {
 		case R.id.start_button:
 			start();
@@ -62,6 +83,7 @@ public class Gong extends Activity implements OnClickListener {
 		createGongTimeSetTextAsyncTask();
 		lightningTimer = new Timer(true);
 		gongTimerTask = new GongTimerTask();
+		gongIntervalMtime = Prefs.getGongInterval(this).longValue() * 1000;
 		lightningTimer.schedule(gongTimerTask, 0, gongTimerTaskIntervalMtime);
 	}
 

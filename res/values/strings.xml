@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string name="main_title">Lightning Gong</string>
     <string name="app_name">Lightning Gong</string>
     <string name="start">Start</string>
     <string name="stop">Stop</string>
     <string name="reset">Reset</string>
+    
+    <string name="settings_title">Settings</string>
+    <string name="gong_interval">Gong Interval (sec)</string>
+    <string name="gong_interval_summary">Interval time to beat a gong (sec)</string>
 </resources>
