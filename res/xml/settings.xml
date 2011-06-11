@@ -5,5 +5,7 @@
 		android:key="gong_interval"
 		android:title="@string/gong_interval"
 		android:summary="@string/gong_interval_summary"
+		android:inputType="number"
+		android:maxLength="5"
 		android:defaultValue="300" />
 </PreferenceScreen>
