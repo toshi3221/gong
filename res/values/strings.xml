@@ -10,4 +10,6 @@
     <string name="settings_title">Settings</string>
     <string name="gong_interval">Gong Interval (sec)</string>
     <string name="gong_interval_summary">Interval time to beat a gong (sec)</string>
+    
+    <string name="lightning_gong_is_running">Lightning Gong is running...</string>
 </resources>

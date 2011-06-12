@@ -1,17 +1,19 @@
 package net.knitcap.gong;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
 import net.knitcap.gong.R;
 
 import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
-import android.os.AsyncTask;
-import android.os.AsyncTask.Status;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -20,14 +22,30 @@ import android.view.View.OnClickListener;
 import android.widget.TextView;
 
 public class Gong extends Activity implements OnClickListener {
+
+	private class GongTimerReceiver extends BroadcastReceiver {
+		
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			setTimerText(intent.getLongExtra("currentMtime", 0));
+		}
+	}
 	
-	private MediaPlayer mediaPlayer = null;
-	private Timer lightningTimer = null;
-	private AsyncTask<String, Object, String> gongTimeSetTextAsyncTask = null;
-	private GongTimerTask gongTimerTask = null;
-	final private long gongTimerTaskIntervalMtime = 100;
-	private long gongIntervalMtime = 300*1000;
-	private long currentMtime = 0;
+	private GongTimerService gongTimerService = null;
+	private final GongTimerReceiver receiver = new GongTimerReceiver();
+	
+	private ServiceConnection serviceConnection = new ServiceConnection() {
+		
+		public void onServiceConnected(ComponentName className, IBinder service) {
+			gongTimerService = ((GongTimerService.GongTimerBinder)service).getService();
+			initTimerView();
+		}
+		
+		public void onServiceDisconnected(final ComponentName className) {
+			gongTimerService = null;
+		}
+		
+	};
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -41,7 +59,7 @@ public class Gong extends Activity implements OnClickListener {
         final View resetButton = findViewById(R.id.reset_button);
         resetButton.setOnClickListener(this);
         
-        setVolumeControlStream(AudioManager.STREAM_MUSIC);
+        startGongService();
     }
 
     @Override
@@ -71,75 +89,64 @@ public class Gong extends Activity implements OnClickListener {
 			stop();
 			break;
 		case R.id.reset_button:
-			reset();
+			resetTimer();
 			break;
 		}
 	}
     
 	private void start() {
-		if (lightningTimer != null) {
-			stop();
-		}
-		createGongTimeSetTextAsyncTask();
-		lightningTimer = new Timer(true);
-		gongTimerTask = new GongTimerTask();
-		gongIntervalMtime = Prefs.getGongInterval(this).longValue() * 1000;
-		lightningTimer.schedule(gongTimerTask, 0, gongTimerTaskIntervalMtime);
+		gongTimerService.start();
+		notifyGongRunning();
 	}
 
-	private void reset() {
-		if (lightningTimer == null) {
-			final TextView timeTextView = (TextView)findViewById(R.id.time);
-			timeTextView.setText("00:00.0");
-			currentMtime = 0;
-		}
-	}
-
-	private void createGongTimeSetTextAsyncTask() {
-		gongTimeSetTextAsyncTask = new AsyncTask<String, Object, String>() {
-			@Override
-			protected String doInBackground(String... params) {
-				return params[0];
-			}
-			@Override
-			protected void onPostExecute(String result) {
-				final TextView timeTextView = (TextView)findViewById(R.id.time);
-				if (timeTextView != null) {
-					timeTextView.setText(result);
-				}
-				createGongTimeSetTextAsyncTask();
-			}
-		};
+	private void initTimerView() {
+		setTimerText(gongTimerService.getCurrentMtime());
 	}
 	
-	private void stop() {
-		if (lightningTimer != null) {
-			lightningTimer.cancel();
-			lightningTimer = null;
-		}
-	}
-	
-	private void gongInterval() {
-		if (currentMtime % gongIntervalMtime == 0) {
-			mediaPlayer = MediaPlayer.create(this, R.raw.dora);
-			mediaPlayer.start();
-		}
-		currentMtime += gongTimerTaskIntervalMtime;
+	private void setTimerText(final long currentMtime) {
 		final long msec = currentMtime % 1000;
 		final long sec = currentMtime / 1000 % 60;
 		final long minute = currentMtime / 60 /1000;
-		while (Status.PENDING != gongTimeSetTextAsyncTask.getStatus()) {
-			try { Thread.sleep(10); } catch (InterruptedException e) {}
-		}
-		gongTimeSetTextAsyncTask.execute(String.format("%02d:%02d.%01d", minute, sec, msec/100));
+		final TextView timeTextView = (TextView)findViewById(R.id.time);
+		timeTextView.setText((String.format("%02d:%02d.%01d", minute, sec, msec/100)));
 	}
 
-	private class GongTimerTask extends TimerTask {
-
-		@Override
-		public void run() {
-			gongInterval();
-		}
+	private void startGongService() {
+		final Intent intent = new Intent(Gong.this, GongTimerService.class);
+		startService(intent);
+		final IntentFilter filter = new IntentFilter(GongTimerService.ACTION);
+		registerReceiver(receiver, filter);
 		
+		bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+	}
+
+	private void notifyGongRunning() {
+		final NotificationManager nm = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+		final Notification n = new Notification(
+									R.drawable.icon,
+									getText(R.string.lightning_gong_is_running),
+									System.currentTimeMillis());
+		final CharSequence contentTitle = getText(R.string.app_name);
+		final CharSequence contentText = getText(R.string.lightning_gong_is_running);
+		final PendingIntent contentIntent = PendingIntent.getActivity(this, 0, getIntent(), 0);
+		n.setLatestEventInfo(getApplicationContext(), contentTitle, contentText, contentIntent);
+		n.flags |= Notification.FLAG_ONGOING_EVENT;
+		nm.notify(1, n);
+	}
+	
+	private void clearGongNotification() {
+		final NotificationManager nm = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+		nm.cancelAll();
+	}
+
+	private void resetTimer() {
+		if (!gongTimerService.isRunning()) {
+			gongTimerService.reset();
+		}
+	}
+	
+	private void stop() {
+		gongTimerService.stop();
+		clearGongNotification();
 	}
 }
