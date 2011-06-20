@@ -3,15 +3,17 @@ package net.knitcap.gong;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import net.knitcap.gong.R;
 
+import android.app.AlarmManager;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.media.MediaPlayer;
 import android.os.Binder;
 import android.os.IBinder;
+import android.os.SystemClock;
+import android.util.Log;
 import android.widget.Toast;
 
 public class GongTimerService extends Service {
@@ -25,20 +27,16 @@ public class GongTimerService extends Service {
 	}
 	
 	public static final String ACTION = "Gong Timer Service";
-	private MediaPlayer mediaPlayer = null;
 	private Timer lightningTimer = null;
 	private GongTimerTask gongTimerTask = null;
-	final private long gongTimerTaskIntervalMtime = 100;
+	final private long gongTimerTaskIntervalMtime = 50;
 	private long gongIntervalMtime = 300*1000;
-	private long currentMtime = 0;
+	private long gongStartTimeMillis = 0;
+	private long previousTotalMtime = 0;
 
 	@Override
 	public IBinder onBind(final Intent intent) {
 		return new GongTimerBinder();
-	}
-
-	@Override
-	public void onStart(Intent intent, int startId) {
 	}
 
 	@Override
@@ -48,20 +46,58 @@ public class GongTimerService extends Service {
 	}
 
 	public void start() {
-		if (lightningTimer == null) {
-			final String m = currentMtime == 0 ?
-					"Lightning Gong start..." :
-					"Lightning Gong resume...";
-			Toast.makeText(this, m, Toast.LENGTH_LONG).show();
-		} else {
-			lightningTimer.cancel();
+		Log.d("GongTimerService::start", "called.");
+		
+		if (isRunning()) {
+			Log.d("GongTimerService::start", "Gong Service has been already started.");
+			return;
 		}
-		lightningTimer = new Timer(true);
-		gongTimerTask = new GongTimerTask();
+
+		final String m = previousTotalMtime == 0 ?
+				"Lightning Gong start..." :
+				"Lightning Gong resume...";
+		Toast.makeText(this, m, Toast.LENGTH_SHORT).show();
+
+		gongStartTimeMillis = SystemClock.elapsedRealtime();
 		gongIntervalMtime = Prefs.getGongInterval(this).longValue() * 1000;
-		lightningTimer.schedule(gongTimerTask, 0, gongTimerTaskIntervalMtime);
+
+		setGongAlerm();
+		startGongTimer();
 	}
 	
+	private void setGongAlerm() {
+		Log.d("GongTimerService::setGongAlerm", "called.");
+		final Intent intent = new Intent(this, GongReceiver.class);
+		final PendingIntent sender = PendingIntent.getBroadcast(this, 0, intent, 0);
+
+		long firstGongTime =
+			SystemClock.elapsedRealtime() +
+				(previousTotalMtime == 0 ? 0 : (gongIntervalMtime - previousTotalMtime % gongIntervalMtime));
+          
+		AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+		alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstGongTime, gongIntervalMtime, sender);  
+	}
+
+	private void cancelGongAlerm() {
+		final Intent intent = new Intent(this, GongReceiver.class);
+		final PendingIntent sender = PendingIntent.getBroadcast(this, 0, intent, 0);
+
+		final AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+		am.cancel(sender);
+	}
+
+	private void startGongTimer() {
+		lightningTimer = new Timer(false);
+		gongTimerTask = new GongTimerTask();
+		
+		lightningTimer.schedule(gongTimerTask, 0, gongTimerTaskIntervalMtime);
+	}
+
+	private void cancelGongTimer() {
+		lightningTimer.cancel();
+		lightningTimer = null;		
+	}
+
 	private void clearGongNotification() {
 		final NotificationManager nm = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
 		nm.cancelAll();
@@ -72,34 +108,27 @@ public class GongTimerService extends Service {
 	}
 
 	public long getCurrentMtime() {
-		return currentMtime;
+		return previousTotalMtime + (isRunning() ? (SystemClock.elapsedRealtime()-gongStartTimeMillis) : 0);
 	}
 
 	public void stop() {
-		if (lightningTimer != null) {
-			lightningTimer.cancel();
-			lightningTimer = null;
+		if (isRunning()) {
+			previousTotalMtime = getCurrentMtime();
+			cancelGongAlerm();
+			cancelGongTimer();
 			clearGongNotification();
 		}
 	}
 	
 	public void reset() {
-		currentMtime = 0;
-		notifyCurrentMtime();
+		previousTotalMtime = 0;
+		notifyCurrentMtime(0);
 	}
 
-	private void gongInterval() {
-		if (currentMtime % gongIntervalMtime == 0) {
-			mediaPlayer = MediaPlayer.create(this, R.raw.dora);
-			mediaPlayer.start();
-		}
-		currentMtime += gongTimerTaskIntervalMtime;
-		notifyCurrentMtime();
-	}
-
-	private void notifyCurrentMtime() {
+	private void notifyCurrentMtime(final long currentMtime) {
 		final Intent gongIntervalIntent = new Intent(ACTION);
 		gongIntervalIntent.putExtra("currentMtime", currentMtime);
+		gongIntervalIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		sendBroadcast(gongIntervalIntent);
 	}
 
@@ -107,8 +136,9 @@ public class GongTimerService extends Service {
 
 		@Override
 		public void run() {
-			gongInterval();
+			notifyCurrentMtime(getCurrentMtime());
 		}
 		
 	}
 }
+

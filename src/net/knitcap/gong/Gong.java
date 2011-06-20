@@ -14,6 +14,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -37,6 +38,7 @@ public class Gong extends Activity implements OnClickListener {
 	private ServiceConnection serviceConnection = new ServiceConnection() {
 		
 		public void onServiceConnected(ComponentName className, IBinder service) {
+			Log.d("ServiceConnection::onServiceConnected", "called.");
 			gongTimerService = ((GongTimerService.GongTimerBinder)service).getService();
 			initTimerView();
 		}
@@ -49,6 +51,8 @@ public class Gong extends Activity implements OnClickListener {
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
+    	Log.d("Gong::onCreate", "called.");
+    	
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
    
@@ -60,6 +64,14 @@ public class Gong extends Activity implements OnClickListener {
         resetButton.setOnClickListener(this);
         
         startGongService();
+    }
+
+    @Override
+    public void onDestroy() {
+    	Log.d("Gong::onDestroy", "called.");
+    	super.onDestroy();
+    	unregisterReceiver(receiver);
+    	unbindService(serviceConnection);
     }
 
     @Override
