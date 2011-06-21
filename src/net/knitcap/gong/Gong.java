@@ -69,9 +69,9 @@ public class Gong extends Activity implements OnClickListener {
     @Override
     public void onDestroy() {
     	Log.d("Gong::onDestroy", "called.");
-    	super.onDestroy();
     	unregisterReceiver(receiver);
     	unbindService(serviceConnection);
+    	super.onDestroy();
     }
 
     @Override

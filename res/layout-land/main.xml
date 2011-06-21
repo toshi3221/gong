@@ -3,7 +3,7 @@
     android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:padding="30dip"
+    android:padding="20dip"
     android:background="@drawable/lightning"
     >
 <LinearLayout
@@ -24,11 +24,18 @@
     android:layout_marginBottom="35dip"
     android:textSize="35sp"
     />
+<TableLayout
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center"
+		android:stretchColumns="*"
+		android:layout_marginBottom="10dip"
+		>
+	<TableRow>
 <Button  
     android:id="@+id/start_button"
     android:layout_width="fill_parent" 
     android:layout_height="wrap_content" 
-    android:layout_marginBottom="25dip"
     android:text="@string/start"
     />
 <Button
@@ -36,15 +43,15 @@
 	android:id="@+id/stop_button"
 	android:text="@string/stop"
 	android:layout_width="match_parent"
-	android:layout_marginBottom="25dip"
 	/>
 <Button
 	android:layout_height="wrap_content"
 	android:id="@+id/reset_button"
 	android:text="@string/reset"
 	android:layout_width="match_parent"
-	android:layout_marginBottom="25dip"
 	/>
+	</TableRow>
+</TableLayout>
 <TextView
 	android:layout_height="wrap_content"
 	android:text="00:00.0"
