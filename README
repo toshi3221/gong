@@ -1,0 +1,26 @@
+Application Name: Lightning Gong
+Version: 0.1
+Date: 06/22/2011
+Category: Timer Tool
+Author: Toshiharu Takematsu
+Source: https://github.com/toshi3221/gong
+License: Apache 2.0 License
+
+Description
+===========
+This application will ring the gong repeatedly at a specified interval time.
+
+History
+=======
+0.1, 06/22/2011 - Initial release.
+
+Contact
+=======
+You can find me on Twitter as '@toshi3221'
+You can send email to info [at] newfish [dot] jp
+
+Credits
+=======
+Thanks to krunkwerke for creating lightning photo.
+Thanks to tobiuo music office 堀彰宏 for gong sound data.
+Thanks to Everaldo Coelho for lightning icon.
