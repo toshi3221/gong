@@ -12,6 +12,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
@@ -55,6 +56,7 @@ public class Gong extends Activity implements OnClickListener {
     	
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        setVolumeControlStream(AudioManager.STREAM_MUSIC); 
    
         final View startButton = findViewById(R.id.start_button);
         startButton.setOnClickListener(this);
