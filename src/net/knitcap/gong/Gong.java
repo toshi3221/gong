@@ -58,12 +58,14 @@ public class Gong extends Activity implements OnClickListener {
         setContentView(R.layout.main);
         setVolumeControlStream(AudioManager.STREAM_MUSIC); 
    
-        final View startButton = findViewById(R.id.start_button);
+        final View startButton = findViewById(R.id.main);
         startButton.setOnClickListener(this);
-        final View stopButton = findViewById(R.id.stop_button);
-        stopButton.setOnClickListener(this);
-        final View resetButton = findViewById(R.id.reset_button);
-        resetButton.setOnClickListener(this);
+//        final View startButton = findViewById(R.id.start_button);
+//        startButton.setOnClickListener(this);
+//        final View stopButton = findViewById(R.id.stop_button);
+//        stopButton.setOnClickListener(this);
+//        final View resetButton = findViewById(R.id.reset_button);
+//        resetButton.setOnClickListener(this);
         
         startGongService();
     }
@@ -87,6 +89,9 @@ public class Gong extends Activity implements OnClickListener {
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
     	switch (item.getItemId()) {
+    	case R.id.reset:
+    		resetTimer();
+    		break;
     	case R.id.settings:
     		startActivity(new Intent(this, Prefs.class));
     		return true;
@@ -96,14 +101,12 @@ public class Gong extends Activity implements OnClickListener {
 
 	public void onClick(final View v) {
 		switch (v.getId()) {
-		case R.id.start_button:
-			start();
-			break;
-		case R.id.stop_button:
-			stop();
-			break;
-		case R.id.reset_button:
-			resetTimer();
+		case R.id.main:
+			if (gongTimerService.isRunning()) {
+				stop();
+			} else {
+				start();
+			}
 			break;
 		}
 	}
@@ -154,9 +157,10 @@ public class Gong extends Activity implements OnClickListener {
 	}
 
 	private void resetTimer() {
-		if (!gongTimerService.isRunning()) {
-			gongTimerService.reset();
+		if (gongTimerService.isRunning()) {
+			stop();
 		}
+		gongTimerService.reset();
 	}
 	
 	private void stop() {

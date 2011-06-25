@@ -13,47 +13,9 @@
     android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:layout_gravity="center"
     android:padding="30dip"
     >
-<LinearLayout
-    android:orientation="vertical"
-    android:layout_height="fill_parent"
-    android:layout_gravity="center"
-    android:layout_width="fill_parent">
-<TextView  
-    android:layout_width="wrap_content" 
-    android:layout_height="wrap_content" 
-    android:text="@string/main_title"
-    android:textColor="@color/title"
-    android:shadowColor="@color/title_shadow"
-    android:shadowDx="1"
-    android:shadowDy="1"
-    android:shadowRadius="1.0"
-    android:layout_gravity="center"
-    android:layout_marginBottom="35dip"
-    android:textSize="35sp"
-    />
-<Button  
-    android:id="@+id/start_button"
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:layout_marginBottom="25dip"
-    android:text="@string/start"
-    />
-<Button
-	android:layout_height="wrap_content"
-	android:id="@+id/stop_button"
-	android:text="@string/stop"
-	android:layout_width="match_parent"
-	android:layout_marginBottom="25dip"
-	/>
-<Button
-	android:layout_height="wrap_content"
-	android:id="@+id/reset_button"
-	android:text="@string/reset"
-	android:layout_width="match_parent"
-	android:layout_marginBottom="25dip"
-	/>
 <TextView
 	android:layout_height="wrap_content"
 	android:text="00:00.0"
@@ -64,8 +26,6 @@
   android:shadowDx="1"
   android:shadowDy="1"
   android:shadowRadius="1.0"
- 	android:id="@+id/time"
-	android:layout_gravity="center"/>
-</LinearLayout>
+ 	android:id="@+id/time"/>
 </LinearLayout>
 </FrameLayout>
