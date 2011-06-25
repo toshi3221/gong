@@ -58,14 +58,8 @@ public class Gong extends Activity implements OnClickListener {
         setContentView(R.layout.main);
         setVolumeControlStream(AudioManager.STREAM_MUSIC); 
    
-        final View startButton = findViewById(R.id.main);
-        startButton.setOnClickListener(this);
-//        final View startButton = findViewById(R.id.start_button);
-//        startButton.setOnClickListener(this);
-//        final View stopButton = findViewById(R.id.stop_button);
-//        stopButton.setOnClickListener(this);
-//        final View resetButton = findViewById(R.id.reset_button);
-//        resetButton.setOnClickListener(this);
+        final View mainView = findViewById(R.id.main);
+        mainView.setOnClickListener(this);
         
         startGongService();
     }
