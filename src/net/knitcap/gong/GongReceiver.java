@@ -8,13 +8,29 @@ import android.util.Log;
 
 public class GongReceiver extends BroadcastReceiver {
 	private static MediaPlayer mediaPlayer = null;
+	private Context ctx;
+	private Intent intent;
 	@Override
 	public void onReceive(Context ctx, Intent intent) {
 		Log.d("GongReceiver::onReceive", "called.");
+		this.ctx = ctx;
+		this.intent = intent;
+		startDora();
+		notifyGong();
+	}
+
+	private void startDora() {
 		if (mediaPlayer!=null) {
 			mediaPlayer.release();
 		}
 		mediaPlayer = MediaPlayer.create(ctx, R.raw.dora);
 		mediaPlayer.start();
+	}
+
+	private void notifyGong() {
+		final Intent gongIntervalIntent = new Intent(GongTimerService.ACTION);
+		gongIntervalIntent.putExtra(GongTimerService.ACTION_EXTRA_ACTION_TYPE, GongTimerService.ACTION_TYPE_GONG);
+		gongIntervalIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		ctx.sendBroadcast(gongIntervalIntent);
 	}
 }

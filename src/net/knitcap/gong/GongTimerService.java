@@ -27,6 +27,10 @@ public class GongTimerService extends Service {
 	}
 	
 	public static final String ACTION = "Gong Timer Service";
+	public static final String ACTION_EXTRA_ACTION_TYPE = "actionType";
+	public static final int ACTION_TYPE_CURRENT_TIME = 1;
+	public static final int ACTION_TYPE_GONG = 2;
+	public static final String ACTION_EXTRA_CURRENT_TIME = "currentTime";
 	private Timer lightningTimer = null;
 	private GongTimerTask gongTimerTask = null;
 	final private long gongTimerTaskIntervalMtime = 50;
@@ -127,7 +131,7 @@ public class GongTimerService extends Service {
 
 	private void notifyCurrentMtime(final long currentMtime) {
 		final Intent gongIntervalIntent = new Intent(ACTION);
-		gongIntervalIntent.putExtra("currentMtime", currentMtime);
+		gongIntervalIntent.putExtra(ACTION_EXTRA_CURRENT_TIME, currentMtime);
 		gongIntervalIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		sendBroadcast(gongIntervalIntent);
 	}

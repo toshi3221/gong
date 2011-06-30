@@ -21,6 +21,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
 public class Gong extends Activity implements OnClickListener {
@@ -29,7 +30,15 @@ public class Gong extends Activity implements OnClickListener {
 		
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			setTimerText(intent.getLongExtra("currentMtime", 0));
+			switch (intent.getIntExtra("actionType", GongTimerService.ACTION_TYPE_CURRENT_TIME)) {
+			case GongTimerService.ACTION_TYPE_CURRENT_TIME:
+				setTimerText(intent.getLongExtra(GongTimerService.ACTION_EXTRA_CURRENT_TIME, 0));
+				break;
+			case GongTimerService.ACTION_TYPE_GONG:
+				Log.d("Gong::GongTimerReceiver.onReceive()", "called.");
+				shakeView();
+			}
+			
 		}
 	}
 	
@@ -122,6 +131,10 @@ public class Gong extends Activity implements OnClickListener {
 		timeTextView.setText((String.format("%02d:%02d.%01d", minute, sec, msec/100)));
 	}
 
+	private void shakeView() {
+		final View backgroundView = findViewById(R.id.main);
+		backgroundView.startAnimation(AnimationUtils.loadAnimation(this, R.anim.shake));
+	}
 	private void startGongService() {
 		final Intent intent = new Intent(Gong.this, GongTimerService.class);
 		startService(intent);
