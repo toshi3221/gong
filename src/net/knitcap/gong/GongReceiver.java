@@ -9,12 +9,10 @@ import android.util.Log;
 public class GongReceiver extends BroadcastReceiver {
 	private static MediaPlayer mediaPlayer = null;
 	private Context ctx;
-	private Intent intent;
 	@Override
 	public void onReceive(Context ctx, Intent intent) {
 		Log.d("GongReceiver::onReceive", "called.");
 		this.ctx = ctx;
-		this.intent = intent;
 		startDora();
 		notifyGong();
 	}

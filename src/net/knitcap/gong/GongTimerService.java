@@ -57,9 +57,9 @@ public class GongTimerService extends Service {
 			return;
 		}
 
-		final String m = previousTotalMtime == 0 ?
-				"Lightning Gong start..." :
-				"Lightning Gong resume...";
+		final CharSequence m = previousTotalMtime == 0 ?
+				getText(R.string.lightning_gong_start) :
+					getText(R.string.lightning_gong_resume);
 		Toast.makeText(this, m, Toast.LENGTH_SHORT).show();
 
 		gongStartTimeMillis = SystemClock.elapsedRealtime();
@@ -121,6 +121,7 @@ public class GongTimerService extends Service {
 			cancelGongAlerm();
 			cancelGongTimer();
 			clearGongNotification();
+			Toast.makeText(this, getText(R.string.lightning_gong_suspend), Toast.LENGTH_SHORT).show();
 		}
 	}
 	

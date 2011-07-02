@@ -12,4 +12,7 @@
     <string name="gong_interval_summary">Interval time to beat a gong (sec)</string>
     
     <string name="lightning_gong_is_running">Lightning Gong is running...</string>
+    <string name="lightning_gong_start">start.</string>
+    <string name="lightning_gong_suspend">suspend.</string>
+    <string name="lightning_gong_resume">resume.</string>
 </resources>
