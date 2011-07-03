@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
-    <color name="title">#ffffff</color>
-    <color name="title_shadow">#000000</color>
+	<color name="title">#FFFFFF</color>
+	<color name="next">#FFFF00</color>
+	<color name="title_shadow">#000000</color>
 </resources>

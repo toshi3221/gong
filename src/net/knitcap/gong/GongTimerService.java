@@ -44,6 +44,12 @@ public class GongTimerService extends Service {
 	}
 
 	@Override
+	public void onCreate() {
+		super.onCreate();
+		gongIntervalMtime = Prefs.getGongInterval(this).longValue() * 1000;
+	}
+
+	@Override
 	public void onDestroy() {
 		super.onDestroy();
 		stop();
@@ -63,7 +69,7 @@ public class GongTimerService extends Service {
 		Toast.makeText(this, m, Toast.LENGTH_SHORT).show();
 
 		gongStartTimeMillis = SystemClock.elapsedRealtime();
-		gongIntervalMtime = Prefs.getGongInterval(this).longValue() * 1000;
+		checkIntervalTime();
 
 		setGongAlerm();
 		startGongTimer();
@@ -111,8 +117,16 @@ public class GongTimerService extends Service {
 		return lightningTimer != null ? true : false;
 	}
 
+	public boolean isIntervalTimeChanged() {
+		return gongIntervalMtime != (Prefs.getGongInterval(this).longValue() * 1000);
+	}
+
 	public long getCurrentMtime() {
 		return previousTotalMtime + (isRunning() ? (SystemClock.elapsedRealtime()-gongStartTimeMillis) : 0);
+	}
+
+	public long getGongNextMtime() {
+		return (getCurrentMtime()/gongIntervalMtime + 1)*gongIntervalMtime;
 	}
 
 	public void stop() {
@@ -127,7 +141,12 @@ public class GongTimerService extends Service {
 	
 	public void reset() {
 		previousTotalMtime = 0;
+		checkIntervalTime();
 		notifyCurrentMtime(0);
+	}
+
+	private void checkIntervalTime() {
+		gongIntervalMtime = Prefs.getGongInterval(this).longValue() * 1000;
 	}
 
 	private void notifyCurrentMtime(final long currentMtime) {

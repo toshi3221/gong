@@ -36,6 +36,7 @@ public class Gong extends Activity implements OnClickListener {
 				break;
 			case GongTimerService.ACTION_TYPE_GONG:
 				Log.d("Gong::GongTimerReceiver.onReceive()", "called.");
+				setGongNextTimeText(gongTimerService.getGongNextMtime());
 				shakeView();
 			}
 			
@@ -71,6 +72,17 @@ public class Gong extends Activity implements OnClickListener {
         mainView.setOnClickListener(this);
         
         startGongService();
+    }
+
+    @Override
+    public void onResume() {
+    	Log.d("Gong::onResume", "called.");
+
+    	super.onResume();
+    	
+	if (gongTimerService != null && gongTimerService.isIntervalTimeChanged()) {
+    		resetTimer();
+    	}
     }
 
     @Override
@@ -121,14 +133,28 @@ public class Gong extends Activity implements OnClickListener {
 
 	private void initTimerView() {
 		setTimerText(gongTimerService.getCurrentMtime());
+		setGongNextTimeText(gongTimerService.getGongNextMtime());
 	}
 	
 	private void setTimerText(final long currentMtime) {
-		final long msec = currentMtime % 1000;
-		final long sec = currentMtime / 1000 % 60;
-		final long minute = currentMtime / 60 /1000;
 		final TextView timeTextView = (TextView)findViewById(R.id.time);
-		timeTextView.setText((String.format("%02d:%02d.%01d", minute, sec, msec/100)));
+		timeTextView.setText(getTimeText(currentMtime));
+	}
+
+	private void setGongNextTimeText(final long gongNextMtime) {
+		final TextView gongNextTimeTextView = (TextView)findViewById(R.id.next_gong_time);
+		gongNextTimeTextView.setText((String)getText(R.string.next_gong_time) + ' ' + getShortTimeText(gongNextMtime));
+	}
+	private String getTimeText(final long mtime) {
+		final long msec = mtime % 1000;
+		final long sec = mtime / 1000 % 60;
+		final long minute = mtime / 60 /1000;
+		return String.format("%02d:%02d.%01d", minute, sec, msec/100);
+	}
+	private String getShortTimeText(final long mtime) {
+		final long sec = mtime / 1000 % 60;
+		final long minute = mtime / 60 /1000;
+		return String.format("%02d:%02d", minute, sec);
 	}
 
 	private void shakeView() {
@@ -168,6 +194,7 @@ public class Gong extends Activity implements OnClickListener {
 			stop();
 		}
 		gongTimerService.reset();
+		setGongNextTimeText(gongTimerService.getGongNextMtime());
 	}
 	
 	private void stop() {
