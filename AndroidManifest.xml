@@ -31,4 +31,5 @@
 									android:process=":remote">
 				</receiver>
     </application>
+    <uses-sdk android:minSdkVersion="4" />
 </manifest>
