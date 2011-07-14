@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="main_title">Lightning Gong</string>
+    <string name="app_name">Lightning Gong</string>
+    <string name="start">開始</string>
+    <string name="stop">停止</string>
+    <string name="reset">リセット</string>
+    <string name="next_gong_time">次回</string>
+    <string name="next_gong_finish">終了</string>
+    
+    <string name="settings_title">設定</string>
+    <string name="gong_interval">間隔設定 (秒)</string>
+    <string name="gong_interval_summary">銅鑼を鳴らす時間間隔 (秒)</string>
+    <string name="gong_times">合計回数</string>
+    <string name="gong_times_summary">銅鑼を鳴らす回数</string>
+    
+    <string name="lightning_gong_is_running">タイマー実行中...</string>
+    <string name="lightning_gong_start">開始しました</string>
+    <string name="lightning_gong_suspend">中断しました</string>
+    <string name="lightning_gong_resume">再開しました</string>
+    <string name="lightning_gong_stop">終了しました</string>
+</resources>

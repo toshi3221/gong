@@ -8,4 +8,11 @@
 		android:inputType="number"
 		android:maxLength="5"
 		android:defaultValue="300" />
+	<EditTextPreference
+		android:key="gong_times"
+		android:title="@string/gong_times"
+		android:summary="@string/gong_times_summary"
+		android:inputType="number"
+		android:maxLength="2"
+		android:defaultValue="11" />
 </PreferenceScreen>
