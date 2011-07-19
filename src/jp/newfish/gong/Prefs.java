@@ -19,6 +19,6 @@ public class Prefs extends PreferenceActivity {
 
 	public static Long getGongTimes(final Context context) {
 		return Long.valueOf(PreferenceManager.getDefaultSharedPreferences(context)
-					.getString("gong_times", "11"));
+					.getString("gong_times", "1"));
 	}
 }

@@ -14,5 +14,5 @@
 		android:summary="@string/gong_times_summary"
 		android:inputType="number"
 		android:maxLength="2"
-		android:defaultValue="11" />
+		android:defaultValue="1" />
 </PreferenceScreen>

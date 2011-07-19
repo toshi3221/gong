@@ -43,7 +43,7 @@ public class GongTimerService extends Service {
 	private long gongIntervalMtime = 300*1000;
 	private long gongStartTimeMillis = 0;
 	private long previousTotalMtime = 0;
-	private long gongTimes = 11;
+	private long gongTimes = 1;
 	final static long NEXT_GONG_TIME_ALREADY_FINISHED = -1;
 	private long gongStopTimeMtime = gongIntervalMtime * gongTimes;
 

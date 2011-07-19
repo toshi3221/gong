@@ -177,9 +177,13 @@ public class Gong extends Activity implements OnClickListener {
 	private void setGongTimeText() {
 		final TextView gongTimesTextView = (TextView)findViewById(R.id.gong_times);
 		final long gongTimes = gongTimerService.getGongTimes();
-		long totalGongTimes = gongTimerService.isRunning() ? gongTimerService.getTotalGongTimes()+1 : 0;
-		totalGongTimes = gongTimerService.isFinished() ? gongTimes : totalGongTimes;
-		gongTimesTextView.setText(String.valueOf(totalGongTimes) + " / " + String.valueOf(gongTimes));
+		if (gongTimes > 1) {
+			long totalGongTimes = gongTimerService.isRunning() ? gongTimerService.getTotalGongTimes()+1 : 0;
+			totalGongTimes = gongTimerService.isFinished() ? gongTimes : totalGongTimes;
+			gongTimesTextView.setText(String.valueOf(totalGongTimes) + " / " + String.valueOf(gongTimes));
+		} else {
+			gongTimesTextView.setText("");
+		}
 	}
 	private String getTimeText(long mtime) {
 		if (gongTimerService.isRunning() ||
