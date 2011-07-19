@@ -29,14 +29,14 @@ public class Gong extends Activity implements OnClickListener {
 		
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			switch (intent.getIntExtra("actionType", GongTimerService.ACTION_TYPE_CURRENT_TIME)) {
-			case GongTimerService.ACTION_TYPE_CURRENT_TIME:
+			switch (intent.getIntExtra("actionType", GongTimerService.ACTION_TYPE_REMAIN_TIME)) {
+			case GongTimerService.ACTION_TYPE_REMAIN_TIME:
 				//Log.d("Gong::GongTimerReceiver.onReceive()", "ACTION_TYPE_CURRENT_TIME");
-				setTimerText(intent.getLongExtra(GongTimerService.ACTION_EXTRA_CURRENT_TIME, 0));
+				setTimerText(intent.getLongExtra(GongTimerService.ACTION_EXTRA_REMAIN_TIME, 300));
 				break;
 			case GongTimerService.ACTION_TYPE_GONG:
 				Log.d("Gong::GongTimerReceiver.onReceive()", "ACTION_TYPE_GONG");
-				setGongTimeText(gongTimerService.getGongNextMtime());
+				setGongTimeText();
 				shakeView();
 				break;
 			case GongTimerService.ACTION_TYPE_GONG_TIMER_SERVICE_STATE:
@@ -150,42 +150,49 @@ public class Gong extends Activity implements OnClickListener {
 	private void start() {
 		gongTimerService.start();
 		notifyGongRunning();
-		setGongTimeText(gongTimerService.getGongNextMtime());
+		setGongTimeText();
 	}
 
 	private void initTimerView() {
-		setTimerText(gongTimerService.getCurrentMtime());
-		setGongTimeText(gongTimerService.getGongNextMtime());
+		final long timerText = gongTimerService.isFinished() ? 0 : gongTimerService.getRemainMtime();
+		setTimerText(timerText);
+		setGongTimeText();
 	}
 	
-	private void setTimerText(final long currentMtime) {
+	private void setTimerText(final long mtime) {
 		final TextView timeTextView = (TextView)findViewById(R.id.time);
-		timeTextView.setText(getTimeText(currentMtime));
+		final String timeText = getTimeText(mtime);
+ 		if (timeText.length() <= 2) {
+			timeTextView.setTextSize(150);
+		} else if (timeText.length() <= 4){
+			timeTextView.setTextSize(125);
+		} else if (timeText.length() <= 5){
+			timeTextView.setTextSize(100);
+		} else {
+			timeTextView.setTextSize(75);
+		}
+		timeTextView.setText(getTimeText(mtime));
 	}
 
-	private void setGongTimeText(final long gongNextMtime) {
-		final TextView gongNextTimeTextView = (TextView)findViewById(R.id.next_gong_time);
-		final String nextTimeText = gongNextMtime == 0 ?
-				(String)getText(R.string.next_gong_finish) :
-					(String)getText(R.string.next_gong_time) + ' ' + getShortTimeText(gongNextMtime);
-		gongNextTimeTextView.setText(nextTimeText);
-		
+	private void setGongTimeText() {
 		final TextView gongTimesTextView = (TextView)findViewById(R.id.gong_times);
 		final long gongTimes = gongTimerService.getGongTimes();
 		long totalGongTimes = gongTimerService.isRunning() ? gongTimerService.getTotalGongTimes()+1 : 0;
 		totalGongTimes = gongTimerService.isFinished() ? gongTimes : totalGongTimes;
 		gongTimesTextView.setText(String.valueOf(totalGongTimes) + " / " + String.valueOf(gongTimes));
 	}
-	private String getTimeText(final long mtime) {
-		final long msec = mtime % 1000;
-		final long sec = mtime / 1000 % 60;
+	private String getTimeText(long mtime) {
+		if (gongTimerService.isRunning() ||
+				gongTimerService.isSuspending()) {
+			mtime += 1000;	// 0秒が表示されたタイミングで銅鑼を鳴らしたい為
+		}
+		long sec = mtime / 1000 % 60;
 		final long minute = mtime / 60 /1000;
-		return String.format("%02d:%02d.%01d", minute, sec, msec/100);
-	}
-	private String getShortTimeText(final long mtime) {
-		final long sec = mtime / 1000 % 60;
-		final long minute = mtime / 60 /1000;
-		return String.format("%02d:%02d", minute, sec);
+		if (minute == 0) {
+			return String.format("%d", sec);
+		} else {
+			return String.format("%d:%02d", minute, sec);
+		}
 	}
 
 	private void shakeView() {
@@ -225,7 +232,7 @@ public class Gong extends Activity implements OnClickListener {
 			stop();
 		}
 		gongTimerService.reset();
-		setGongTimeText(gongTimerService.getGongNextMtime());
+		setGongTimeText();
 	}
 	
 	private void stop() {

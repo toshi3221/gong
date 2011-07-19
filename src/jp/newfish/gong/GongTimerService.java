@@ -28,10 +28,10 @@ public class GongTimerService extends Service {
 	
 	public static final String ACTION = "Gong Timer Service";
 	public static final String ACTION_EXTRA_ACTION_TYPE = "actionType";
-	public static final int ACTION_TYPE_CURRENT_TIME = 1;
+	public static final int ACTION_TYPE_REMAIN_TIME = 1;
 	public static final int ACTION_TYPE_GONG = 2;
 	public static final int ACTION_TYPE_GONG_TIMER_SERVICE_STATE = 3;
-	public static final String ACTION_EXTRA_CURRENT_TIME = "currentTime";
+	public static final String ACTION_EXTRA_REMAIN_TIME = "remainTime";
 	public static final String ACTION_EXTRA_GONG_TIMER_SERVICE_STATE = "gongTimerServiceState";
 	public static final String ACTION_EXTRA_GONG_TIMER_SERVICE_STATE_START = "start";
 	public static final String ACTION_EXTRA_GONG_TIMER_SERVICE_STATE_SUSPEND = "suspend";
@@ -93,7 +93,7 @@ public class GongTimerService extends Service {
 
 		long firstGongTime =
 			SystemClock.elapsedRealtime() +
-				(previousTotalMtime == 0 ? 0 : (gongIntervalMtime - previousTotalMtime % gongIntervalMtime));
+				(gongIntervalMtime - previousTotalMtime % gongIntervalMtime);
           
 		AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 		alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstGongTime, gongIntervalMtime, sender);  
@@ -128,6 +128,10 @@ public class GongTimerService extends Service {
 		return lightningTimer != null ? true : false;
 	}
 
+	public boolean isSuspending() {
+		return previousTotalMtime > 0 && !isFinished() ? true : false;
+	}
+
 	public boolean isFinished() {
 		return getCurrentMtime() >= gongStopTimeMtime ? true : false;
 	}
@@ -135,6 +139,10 @@ public class GongTimerService extends Service {
 	public boolean isPrefsChanged() {
 		return (gongIntervalMtime != (Prefs.getGongInterval(this).longValue() * 1000) ||
 			gongTimes != (Prefs.getGongTimes(this).longValue()));
+	}
+
+	public long getRemainMtime() {
+		return gongIntervalMtime - (getCurrentMtime() % gongIntervalMtime);
 	}
 
 	public long getCurrentMtime() {
@@ -173,7 +181,7 @@ public class GongTimerService extends Service {
 	public void reset() {
 		previousTotalMtime = 0;
 		checkPrefs();
-		notifyCurrentMtime(0);
+		notifyRemainMtime(getRemainMtime());
 	}
 
 	private void checkPrefs() {
@@ -190,9 +198,10 @@ public class GongTimerService extends Service {
 		sendBroadcast(gongIntervalIntent);		
 	}
 
-	private void notifyCurrentMtime(final long currentMtime) {
+	private void notifyRemainMtime(final long remainMtime) {
 		final Intent gongIntervalIntent = new Intent(ACTION);
-		gongIntervalIntent.putExtra(ACTION_EXTRA_CURRENT_TIME, currentMtime);
+		gongIntervalIntent.putExtra(ACTION_EXTRA_ACTION_TYPE, GongTimerService.ACTION_TYPE_REMAIN_TIME);
+		gongIntervalIntent.putExtra(ACTION_EXTRA_REMAIN_TIME, remainMtime);
 		gongIntervalIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		sendBroadcast(gongIntervalIntent);
 	}
@@ -201,13 +210,14 @@ public class GongTimerService extends Service {
 
 		@Override
 		public void run() {
-			long notifyCurrentMtime = getCurrentMtime();
-			if (notifyCurrentMtime >= gongStopTimeMtime) {
+			final long currentMtime = getCurrentMtime();
+			long notifyRemainMtime = getRemainMtime();
+			if (currentMtime >= gongStopTimeMtime) {
 				previousTotalMtime = gongStopTimeMtime;
-				notifyCurrentMtime = gongStopTimeMtime;
+				notifyRemainMtime = 0;
 				stop();
 			}
-			notifyCurrentMtime(notifyCurrentMtime);
+			notifyRemainMtime(notifyRemainMtime);
 		}
 		
 	}

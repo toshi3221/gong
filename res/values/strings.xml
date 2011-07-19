@@ -6,8 +6,7 @@
     <string name="start">Start</string>
     <string name="stop">Stop</string>
     <string name="reset">Reset</string>
-    <string name="next_gong_time">Next</string>
-    <string name="next_gong_finish">Finish</string>
+    <string name="gong_finish">Finish</string>
     
     <string name="settings_title">Settings</string>
     <string name="gong_interval">Gong Interval (sec)</string>

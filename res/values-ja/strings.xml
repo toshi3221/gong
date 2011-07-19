@@ -6,8 +6,7 @@
     <string name="start">開始</string>
     <string name="stop">停止</string>
     <string name="reset">リセット</string>
-    <string name="next_gong_time">次回</string>
-    <string name="next_gong_finish">終了</string>
+    <string name="gong_finish">終了</string>
     
     <string name="settings_title">設定</string>
     <string name="gong_interval">間隔設定 (秒)</string>
