@@ -107,16 +107,20 @@ public class GongTimerService extends Service {
 		am.cancel(sender);
 	}
 
-	private void startGongTimer() {
-		lightningTimer = new Timer(false);
-		gongTimerTask = new GongTimerTask();
-		
-		lightningTimer.schedule(gongTimerTask, 0, gongTimerTaskIntervalMtime);
+	synchronized private void startGongTimer() {
+		if (lightningTimer == null) {
+			lightningTimer = new Timer(false);
+			gongTimerTask = new GongTimerTask();
+			
+			lightningTimer.schedule(gongTimerTask, 0, gongTimerTaskIntervalMtime);
+		}
 	}
 
-	private void cancelGongTimer() {
-		lightningTimer.cancel();
-		lightningTimer = null;		
+	synchronized private void cancelGongTimer() {
+		if (lightningTimer != null) {
+			lightningTimer.cancel();
+			lightningTimer = null;
+		}
 	}
 
 	private void clearGongNotification() {
