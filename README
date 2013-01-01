@@ -1,5 +1,5 @@
 Application Name: Lightning Gong
-Version: 1.2
+Version: 1.2.1
 Category: Timer Tool
 Author: Toshiharu Takematsu
 Source: https://github.com/toshi3221/gong
@@ -10,11 +10,12 @@ This application will ring the gong repeatedly at a specified interval time.
 
 History
 =======
-1.2, 07/20/2011 - If the total number of 1 has been changed to the total number of text does not appear.
+1.2.1, 01/01/2013 - Bug fix. See detail #1 and #2.
+1.2,   07/20/2011 - If the total number of 1 has been changed to the total number of text does not appear.
                   Display time was changed from the total time to the time remaining.
-1.1, 07/14/2011 - It was possible to set the total number of gongs.
-1.0, 07/04/2011 - The first public version of the Android Market.
-0.1, 06/22/2011 - Initial release.
+1.1,   07/14/2011 - It was possible to set the total number of gongs.
+1.0,   07/04/2011 - The first public version of the Android Market.
+0.1,   06/22/2011 - Initial release.
 
 Contact
 =======
