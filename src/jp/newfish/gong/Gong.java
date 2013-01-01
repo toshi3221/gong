@@ -215,7 +215,7 @@ public class Gong extends Activity implements OnClickListener {
 	private void notifyGongRunning() {
 		final NotificationManager nm = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
 		final Notification n = new Notification(
-									R.drawable.icon,
+									R.drawable.icon_notification,
 									getText(R.string.lightning_gong_is_running),
 									System.currentTimeMillis());
 		final CharSequence contentTitle = getText(R.string.app_name);
