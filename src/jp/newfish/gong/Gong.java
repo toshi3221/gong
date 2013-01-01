@@ -19,6 +19,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.WindowManager;
 import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -54,6 +55,12 @@ public class Gong extends Activity implements OnClickListener {
 				} else {
 					Log.e("Gong::GongTimerReceiver.onReceive()", "UNKNOWN gong timer service state.");
 					return;
+				}
+				if (gongTimerServiceState.equals(GongTimerService.ACTION_EXTRA_GONG_TIMER_SERVICE_STATE_START) ||
+						gongTimerServiceState.equals(GongTimerService.ACTION_EXTRA_GONG_TIMER_SERVICE_STATE_RESUME)) {
+					getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+				} else {
+					getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 				}
 				Toast.makeText(context, getText(toastTextId), Toast.LENGTH_SHORT).show();
 				break;
