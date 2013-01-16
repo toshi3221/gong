@@ -37,6 +37,7 @@ public class GongTimerService extends Service {
 	public static final String ACTION_EXTRA_GONG_TIMER_SERVICE_STATE_SUSPEND = "suspend";
 	public static final String ACTION_EXTRA_GONG_TIMER_SERVICE_STATE_RESUME = "resume";
 	public static final String ACTION_EXTRA_GONG_TIMER_SERVICE_STATE_STOP = "stop";
+	public static final String ACTION_EXTRA_GONG_TIMER_SERVICE_STATE_SKIP = "skip";
 	private Timer lightningTimer = null;
 	private GongTimerTask gongTimerTask = null;
 	final private long gongTimerTaskIntervalMtime = 50;
@@ -67,6 +68,10 @@ public class GongTimerService extends Service {
 	}
 
 	public void start() {
+		start(false);
+	}
+	
+	private void start(final boolean isSkip) {
 		Log.d("GongTimerService::start", "called.");
 		
 		if (isRunning()) {
@@ -77,7 +82,9 @@ public class GongTimerService extends Service {
 		final String timerServiceState = previousTotalMtime == 0 ?
 				GongTimerService.ACTION_EXTRA_GONG_TIMER_SERVICE_STATE_START :
 				GongTimerService.ACTION_EXTRA_GONG_TIMER_SERVICE_STATE_RESUME;
-		notifyGongTimerState(timerServiceState);
+		if (!isSkip) {
+			notifyGongTimerState(timerServiceState);
+		}
 
 		gongStartTimeMillis = SystemClock.elapsedRealtime();
 		checkPrefs();
@@ -169,12 +176,17 @@ public class GongTimerService extends Service {
 	}
 
 	public void stop() {
+		stop(false);
+	}
+	public void stop(final boolean isSkip) {
 		if (isRunning()) {
 			previousTotalMtime = getCurrentMtime();
 			clearGongNotification();
 			cancelGongAlerm();
 			cancelGongTimer();
-			if (previousTotalMtime < gongStopTimeMtime) {
+			if (isSkip) {
+				return;
+			} else if (previousTotalMtime < gongStopTimeMtime) {
 				notifyGongTimerState(ACTION_EXTRA_GONG_TIMER_SERVICE_STATE_SUSPEND);
 			} else {
 				notifyGongTimerState(ACTION_EXTRA_GONG_TIMER_SERVICE_STATE_STOP);
@@ -182,6 +194,19 @@ public class GongTimerService extends Service {
 		}
 	}
 	
+	public void skip() {
+		stop(true);
+		previousTotalMtime = getGongNextMtime();
+		gongStartTimeMillis = SystemClock.elapsedRealtime();
+		if (previousTotalMtime < gongStopTimeMtime) {
+			start(true);
+			notifyGongTimerState(ACTION_EXTRA_GONG_TIMER_SERVICE_STATE_SKIP);
+		} else {
+			notifyGongTimerState(ACTION_EXTRA_GONG_TIMER_SERVICE_STATE_STOP);
+			notifyRemainMtime(0);
+		}
+	}
+
 	public void reset() {
 		previousTotalMtime = 0;
 		checkPrefs();

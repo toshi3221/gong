@@ -52,12 +52,15 @@ public class Gong extends Activity implements OnClickListener {
 					toastTextId = R.string.lightning_gong_resume;
 				} else if (gongTimerServiceState.equals(GongTimerService.ACTION_EXTRA_GONG_TIMER_SERVICE_STATE_STOP)){
 					toastTextId = R.string.lightning_gong_stop;
+				} else if (gongTimerServiceState.equals(GongTimerService.ACTION_EXTRA_GONG_TIMER_SERVICE_STATE_SKIP)){
+					toastTextId = R.string.lightning_gong_skip;
 				} else {
 					Log.e("Gong::GongTimerReceiver.onReceive()", "UNKNOWN gong timer service state.");
 					return;
 				}
 				if (gongTimerServiceState.equals(GongTimerService.ACTION_EXTRA_GONG_TIMER_SERVICE_STATE_START) ||
-						gongTimerServiceState.equals(GongTimerService.ACTION_EXTRA_GONG_TIMER_SERVICE_STATE_RESUME)) {
+						gongTimerServiceState.equals(GongTimerService.ACTION_EXTRA_GONG_TIMER_SERVICE_STATE_RESUME) ||
+						gongTimerServiceState.equals(GongTimerService.ACTION_EXTRA_GONG_TIMER_SERVICE_STATE_SKIP)) {
 					getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 				} else {
 					getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -136,6 +139,15 @@ public class Gong extends Activity implements OnClickListener {
     	case R.id.settings:
     		startActivity(new Intent(this, Prefs.class));
     		return true;
+    	case R.id.skip:
+    		if (!gongTimerService.isFinished()) {
+    			if (!gongTimerService.isRunning()) {
+    				notifyGongRunning();
+    			}
+    			gongTimerService.skip();
+    			setGongTimeText();
+    		}
+    		break;
     	}
     	return false;
     }
