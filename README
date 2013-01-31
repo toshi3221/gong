@@ -1,5 +1,5 @@
 Application Name: Lightning Gong
-Version: 1.2.1
+Version: 1.3
 Category: Timer Tool
 Author: Toshiharu Takematsu
 Source: https://github.com/toshi3221/gong
@@ -10,6 +10,7 @@ This application will ring the gong repeatedly at a specified interval time.
 
 History
 =======
+1.3,   01/31/2013 - Implement skip timer.
 1.2.1, 01/01/2013 - Bug fix. See detail #1 and #2.
 1.2,   07/20/2011 - If the total number of 1 has been changed to the total number of text does not appear.
                   Display time was changed from the total time to the time remaining.
