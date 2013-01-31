@@ -141,10 +141,10 @@ public class Gong extends Activity implements OnClickListener {
     		return true;
     	case R.id.skip:
     		if (!gongTimerService.isFinished()) {
-    			if (!gongTimerService.isRunning()) {
+    			gongTimerService.skip();
+    			if (gongTimerService.isRunning()) {
     				notifyGongRunning();
     			}
-    			gongTimerService.skip();
     			setGongTimeText();
     		}
     		break;

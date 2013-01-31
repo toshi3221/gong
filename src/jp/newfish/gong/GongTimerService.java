@@ -181,7 +181,7 @@ public class GongTimerService extends Service {
 	public void stop(final boolean isSkip) {
 		if (isRunning()) {
 			previousTotalMtime = getCurrentMtime();
-			clearGongNotification();
+			if (!isSkip) { clearGongNotification(); }
 			cancelGongAlerm();
 			cancelGongTimer();
 			if (isSkip) {
@@ -202,6 +202,7 @@ public class GongTimerService extends Service {
 			start(true);
 			notifyGongTimerState(ACTION_EXTRA_GONG_TIMER_SERVICE_STATE_SKIP);
 		} else {
+			clearGongNotification();
 			notifyGongTimerState(ACTION_EXTRA_GONG_TIMER_SERVICE_STATE_STOP);
 			notifyRemainMtime(0);
 		}
