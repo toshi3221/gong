@@ -10,17 +10,24 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
+import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
+import android.view.Display;
 import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -89,6 +96,9 @@ public class Gong extends Activity implements OnClickListener {
 		
 	};
 
+	private static Bitmap lightningBitmap = null;
+	private static Bitmap resizedLightningBitmap = null;
+
     @Override
     public void onCreate(final Bundle savedInstanceState) {
     	Log.d("Gong::onCreate", "called.");
@@ -99,6 +109,27 @@ public class Gong extends Activity implements OnClickListener {
    
         final View mainView = findViewById(R.id.main);
         mainView.setOnClickListener(this);
+        
+        final ImageView lightningImage = (ImageView)findViewById(R.id.lightning_image);
+        final Resources res = getResources();
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        lightningBitmap = BitmapFactory.decodeResource(res, R.drawable.lightning, options);
+        final int lightningImageHeight = options.outHeight;  
+        final int lightningImageWidth = options.outWidth;
+		final WindowManager wm = (WindowManager)getSystemService(WINDOW_SERVICE);
+		final Display disp = wm.getDefaultDisplay();
+		final int windowHeight = disp.getHeight();
+		final int windowWidth = disp.getWidth();
+		options.inJustDecodeBounds = false;
+		options.inSampleSize = lightningImageHeight/windowHeight;
+		options.inPurgeable = true;
+		options.inPreferredConfig = Config.RGB_565;
+		lightningBitmap = BitmapFactory.decodeResource(res, R.drawable.lightning, options);
+		final int resizedLightningWidth = windowHeight > windowWidth ? windowHeight*lightningImageWidth/lightningImageHeight : windowWidth;
+		final int resizedLightningHeight = windowHeight > windowWidth ? windowHeight : windowWidth*lightningImageHeight/lightningImageWidth;
+		resizedLightningBitmap = Bitmap.createScaledBitmap(lightningBitmap, resizedLightningWidth, resizedLightningHeight, false);
+		lightningImage.setImageBitmap(resizedLightningBitmap);
         
         startGongService();
     }
@@ -117,7 +148,9 @@ public class Gong extends Activity implements OnClickListener {
     @Override
     public void onDestroy() {
     	Log.d("Gong::onDestroy", "called.");
-    	unregisterReceiver(receiver);
+		if (lightningBitmap != null && !lightningBitmap.isRecycled()) { lightningBitmap.recycle(); }
+		if (resizedLightningBitmap != null & !resizedLightningBitmap.isRecycled()) { resizedLightningBitmap.recycle(); }
+		unregisterReceiver(receiver);
     	unbindService(serviceConnection);
     	super.onDestroy();
     }
@@ -179,17 +212,15 @@ public class Gong extends Activity implements OnClickListener {
 	}
 	
 	private void setTimerText(final long mtime) {
+		final View mainArea = findViewById(R.id.main);
+		final int mainAreaWidth = mainArea.getWidth();
+		final int mainAreaHeight = mainArea.getHeight();
 		final TextView timeTextView = (TextView)findViewById(R.id.time);
 		final String timeText = getTimeText(mtime);
- 		if (timeText.length() <= 2) {
-			timeTextView.setTextSize(150);
-		} else if (timeText.length() <= 4){
-			timeTextView.setTextSize(125);
-		} else if (timeText.length() <= 5){
-			timeTextView.setTextSize(100);
-		} else {
-			timeTextView.setTextSize(75);
-		}
+		final int timeTextLength = timeText.length();
+		final float timeTextCacheSizeControlFloat = (float)(0.85 + (timeTextLength-1)*0.15);
+		final float textSize = mainAreaWidth < mainAreaHeight ? (float)((mainAreaWidth*timeTextCacheSizeControlFloat)/timeTextLength) : (float)(mainAreaHeight/1.5);
+		timeTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, (float)textSize);
 		timeTextView.setText(getTimeText(mtime));
 	}
 
@@ -205,8 +236,9 @@ public class Gong extends Activity implements OnClickListener {
 		}
 	}
 	private String getTimeText(long mtime) {
-		if (gongTimerService.isRunning() ||
-				gongTimerService.isSuspending()) {
+		if (gongTimerService != null &&
+				(gongTimerService.isRunning() ||
+				gongTimerService.isSuspending())) {
 			mtime += 1000;	// 0秒が表示されたタイミングで銅鑼を鳴らしたい為
 		}
 		long sec = mtime / 1000 % 60;

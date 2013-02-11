@@ -1,41 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/main"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-<ImageView
-		android:src="@drawable/lightning"
-		android:scaleType="centerCrop"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		/>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+
+  <ImageView
+		android:id="@+id/lightning_image"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_gravity="center"
-    android:padding="30dip"
-    >
-<TextView
-	android:layout_height="wrap_content"
-	android:layout_width="wrap_content"
-  android:textColor="@color/title"
-  android:shadowColor="@color/title_shadow"
-  android:shadowDx="1"
-  android:shadowDy="1"
-  android:shadowRadius="1.0"
- 	android:id="@+id/time"/>
-<TextView
-	android:layout_height="wrap_content"
-	android:layout_width="wrap_content"
-	android:textSize="30sp"
-	android:textColor="@color/gong_times"
-	android:shadowColor="@color/title_shadow"
-	android:shadowDx="1"
-	android:shadowDy="1"
-	android:shadowRadius="1.0"
-	android:id="@+id/gong_times"
-	android:layout_gravity="right"
-	/>
-</LinearLayout>
+    android:scaleType="center"
+     />
+
+  <TextView
+			android:id="@+id/gong_times"
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:textSize="30sp"
+			android:textColor="@color/gong_times"
+			android:shadowColor="@color/title_shadow"
+			android:shadowDx="1"
+			android:shadowDy="1"
+			android:shadowRadius="1.0"
+	    android:layout_gravity="right"
+	    android:padding="5dp"
+		/>
+  <TextView
+	    android:id="@+id/time"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:textColor="@color/title"
+	    android:shadowColor="@color/title_shadow"
+	    android:shadowDx="1"
+	    android:shadowDy="1"
+	    android:shadowRadius="1.0"
+			android:layout_gravity="center"
+	  />
 </FrameLayout>
