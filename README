@@ -10,6 +10,7 @@ This application will ring the gong repeatedly at a specified interval time.
 
 History
 =======
+1.3.2, 02/12/2013 - Fix the bug that time text isn't visible when the application is opened.
 1.3.1, 02/11/2013 - Optimization in high-resolution devices such as the Nexus 10.
 1.3,   01/31/2013 - Implement skip timer.
 1.2.1, 01/01/2013 - Bug fix. See detail #1 and #2.

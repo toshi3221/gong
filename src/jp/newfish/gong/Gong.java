@@ -212,14 +212,15 @@ public class Gong extends Activity implements OnClickListener {
 	}
 	
 	private void setTimerText(final long mtime) {
-		final View mainArea = findViewById(R.id.main);
-		final int mainAreaWidth = mainArea.getWidth();
-		final int mainAreaHeight = mainArea.getHeight();
+		final WindowManager wm = (WindowManager)getSystemService(WINDOW_SERVICE);
+		final Display disp = wm.getDefaultDisplay();
+		final int windowWidth = disp.getWidth();
+		final int windowHeight = disp.getHeight();
 		final TextView timeTextView = (TextView)findViewById(R.id.time);
 		final String timeText = getTimeText(mtime);
 		final int timeTextLength = timeText.length();
 		final float timeTextCacheSizeControlFloat = (float)(0.85 + (timeTextLength-1)*0.15);
-		final float textSize = mainAreaWidth < mainAreaHeight ? (float)((mainAreaWidth*timeTextCacheSizeControlFloat)/timeTextLength) : (float)(mainAreaHeight/1.5);
+		final float textSize = windowWidth < windowHeight ? (float)((windowWidth*timeTextCacheSizeControlFloat)/timeTextLength) : (float)(windowHeight/(0.65+timeTextCacheSizeControlFloat));
 		timeTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, (float)textSize);
 		timeTextView.setText(getTimeText(mtime));
 	}
